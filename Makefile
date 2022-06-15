@@ -11,7 +11,7 @@ DATA     += $(PKG_ROOT)/data/CD_06_Mall_wID.rda
 DATA     += $(PKG_ROOT)/data/CN_06_Mall_wID.rda
 RFILES    = $(wildcard $(PKG_ROOT)/R/*.R)
 VIGNETTES = $(wildcard $(PKG_ROOT)/vignettes/*.Rmd)
-TESTS     = $(wildcard $(PKG_ROOT)/tests/testthat/*.R)
+TESTS     = $(wildcard $(PKG_ROOT)/tests/*.R)
 
 ################################################################################
 # Recipes
@@ -59,10 +59,8 @@ uninstall :
 
 coverage-report.html : $(R) $(TESTS) $(VIGNETTES)
 	Rscript --vanilla --quiet -e "options(repo = c('$(CRAN)'))" \
-		-e "if (!require(git2r)) {install.packages('git2r', repo = c('$(CRAN)'))}" \
 		-e "if (!require(covr)) {install.packages('covr', repo = c('$(CRAN)'))}" \
-		-e "git2r::status()"\
-		-e "git2r::repository('.')"\
+		-e "if (!require(DT)) {install.packages('DT', repo = c('$(CRAN)'))}" \
 		-e "coverage <- covr::package_coverage(type = 'tests')"\
 		-e "covr::report(coverage, file = 'coverage-report.html')"
 
