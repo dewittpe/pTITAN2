@@ -1,3 +1,11 @@
+# pTITAN2 1.0.2.9000
+
+## New Features
+
+* ptitan - a wrapper function for generating the permutations of TITAN2::titan,
+  in parallel or sequentially, via the foreach and doMC packages.
+
+
 # pTITAN2 1.0.2
 
 * Add CITATION file
