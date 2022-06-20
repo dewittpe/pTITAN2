@@ -15,6 +15,9 @@
 #' **Important** The station ID column name needs to be the same for all the
 #' taxa and environmental gradient data.frames.
 #'
+#' permute2 will attempt to generate permutations with a minimum frequency of
+#' taxon.
+#'
 #' @param taxa a list of \code{data.frame}s with the taxa.  See Details.
 #' @param envs a list of \code{data.frame}s with the environmental gradients. See
 #' Details
@@ -113,7 +116,6 @@ permute <- function(taxa, envs, sid) {
   rtn
 }
 
-#'
 #'
 #' @param minTaxonFreq min number of occurrences for each taxon
 #' @param trys maximum number of attempts to generate a meaningful permutation
