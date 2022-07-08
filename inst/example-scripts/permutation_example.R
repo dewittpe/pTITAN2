@@ -1,12 +1,7 @@
-# expect to be evaluated from the package source root.
 set.seed(42)
-load("./data/C_IC_D_06_wID.rda")
-load("./data/C_IC_N_06_wID.rda")
-load("./data/CD_06_Mall_wID.rda")
-load("./data/CN_06_Mall_wID.rda")
-source("./R/permute.R")
-source("./R/occurrences.R")
+library(pTITAN2)
 
+################################################################################
 # Create an expression to replicate, that is, create several permutations.  Below
 # will be an example call for serial replication and an example for parallel
 # replication
@@ -22,7 +17,7 @@ expr <- expression(
               TITAN2::titan(env  = p[["Treatment1"]][["env"]][[1]],
                             txa  = trt_codes_1,
                             boot = TRUE,
-                            nBoot = 5) #Change the number of bootstraps here
+                            nBoot = 5) # Change the number of bootstraps here
               , silent = TRUE)
 
   out2 <- try(
@@ -54,6 +49,7 @@ expr <- expression(
 ) # end of expr definition
 
 
+
 # Create the 10 Permutations
 
 # Serial Computations
@@ -65,4 +61,8 @@ permutation_example <- parallel::mclapply(1:10, eval, expr = expr, mc.cores = 4L
 permutation_example <- do.call(rbind, permutation_example)
 permutation_example[["permutation"]] <- seq(1, nrow(permutation_example))
 permutation_example
+
+################################################################################
+#                                 End of File                                  #
+################################################################################
 

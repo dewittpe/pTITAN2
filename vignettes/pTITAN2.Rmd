@@ -467,7 +467,7 @@ package to send the task of permuting the data and running `TITAN2::titan()`
 to individual processing cores.  That is system dependent and left to the end
 user to implement.  For an example of generating the permutations with `TITAN2::titan()`
 see the example script provided at:
-```{r }
+```{r, results = "hide"}
 system.file("example-scripts/permutation_example.R", package = "pTITAN2")
 ```
 That file will generate the provided data set `permutation_example` with 10 rows
