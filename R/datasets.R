@@ -12,6 +12,17 @@
 #' \code{CN_06_Mall_wID} (Chaparral Region, Treatment = Normal) file contains
 #' raw macroinvertebrate density data for 500 possible macroinvertebrate codes
 #' for each taxonomic level (class, order, family, genus).
+#' \code{CD_06_Mall_wID} has the same information for the dry treatement.
+#'
+#' Names for the columns within the Taxonomic files are expected to have the
+#' following structure:
+#' \itemize{
+#'    \item{8 characters in length}
+#'    \item{characters 1 and 2 denote the class}
+#'    \item{characters 3 and 4 denote the order}
+#'    \item{characters 5 and 6 denote the family}
+#'    \item{characters 7 and 8 denote the genus}
+#' }
 #'
 #' The raw data files are provided for your use as well.  See example below for
 #' accessing these files.
