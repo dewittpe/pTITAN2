@@ -23,6 +23,10 @@
 #'    \item{characters 5 and 6 denote the family}
 #'    \item{characters 7 and 8 denote the genus}
 #' }
+#' If no information at a level exists, use "00" to hold the place. For example:
+#' A code that is 'Bi000000' is the Bivalvia class, while BiVe0000 is the
+#' Bivalvia class, Veneroida order. BiVeSh00 is the Bivalvia class, Veneroida
+#' order, Spheriridae family. BiVeSh01 is a genus within that family.
 #'
 #' The raw data files are provided for your use as well.  See example below for
 #' accessing these files.
