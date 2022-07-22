@@ -1,0 +1,231 @@
+---
+title: "pTITAN2"
+subtitle: "occurrences"
+output:
+  bookdown::html_document2: default
+bibliography: references.bib
+vignette: >
+ %\VignetteEngine{knitr::rmarkdown}
+ %\VignetteIndexEntry{pTITAN2-occurrences}
+ %\VignetteEncoding{UTF-8}
+---
+
+```{r label=setup, include = FALSE}
+library(knitr)
+knitr::opts_chunk$set(collapse = TRUE)
+```
+
+**Objective:** Provide extended details on the `occurrences` function.  This
+includes the how and why of the function and examples reproducing the output of
+the `occurrences` function using different R data manipulation dialects: base R,
+the [Tidyverse](https://www.tidyverse.org/), and
+[data.table](https://rdatatable.gitlab.io/data.table/).
+
+# Introduction
+
+The `occurrences` function selects the codes that should be used for the
+`TITAN2::titan` run. The goal is to select the macroinvertebrate code with the
+most taxonomic detail having at least `n` occurrences. Only one
+macroinvertebrate code will be associated with the macroinvertebrate counts. For
+example, if there are at least `r as.list(args(pTITAN2::occurrences))$n`
+occurrences at the genus level, the family, order, and class codes would not be
+used in the `TITAN2::titan` run.
+
+The names within the input taxonomic data set are expected to have the following
+structure:
+
+* 8 characters in length
+* characters 1 and 2 denote the class
+* characters 3 and 4 denote the order
+* characters 5 and 6 denote the family
+* characters 7 and 8 denote the genus.
+
+If no information at a level exists, use "00" to hold the place. For example: A
+code that is 'Bi000000' is the Bivalvia class, while BiVe0000 is the Bivalvia
+class, Veneroida order. BiVeSh00 is the Bivalvia class, Veneroida order,
+Spheriridae family. BiVeSh01 is a genus within that family.
+
+Taking taxonomic data as an input, the return of `occurrences` function is a
+`data.frame` with the taxon, the class, order, family, and genus split out into
+individual columns, and the count of occurrences within the provided taxonomic
+data set.
+
+`TITAN2::titan` recommends all taxonomic groups have at least five observations
+[@baker2010new]. Thus, `occurances` returns only taxons with at least `n`
+observations, defaulting to
+`r as.list(args(pTITAN2::occurrences))$n`.
+The taxonomic code chosen for analysis should be at the finest possible
+resolution.  For example, if a macroinvertebrate count has at least
+`r as.list(args(pTITAN2::occurrences))$n` occurrences in a
+genus code, the family, order, and class codes associated with these counts
+should be removed. Further, if there are too few counts at the genus level, but
+at least 
+`r as.list(args(pTITAN2::occurrences))$n` counts at the family level- the
+family code would be retained and the order and class codes would be removed.
+
+
+
+# Example
+
+To reproduce the example in this vignette you will need to load and attach
+the pTITAN2 and magrittr namespaces.  Other namespaces are used explicitly,
+loaded (not attached) here.
+
+```{r }
+library(pTITAN2)
+library(magrittr)
+loadNamespace("data.table")
+loadNamespace("dplyr")
+loadNamespace("tidyr")
+```
+
+The taxonomic sets, CD_06_Mall_wID and CN_06_Mall_wID, contains raw
+macroinvertebrate density data for 500 possible macroinvertebrate codes for
+each taxonomic level (class, order, family, genus).
+```{r}
+dim(CD_06_Mall_wID)  # Taxonomic, Dry Treatment
+dim(CN_06_Mall_wID)  # Taxonomic, Normal Treatment
+
+# top 4 rows and first 10 columns
+CD_06_Mall_wID[1:4, 1:10]
+CN_06_Mall_wID[1:4, 1:10]
+```
+
+```{r}
+occurrences
+```
+
+A new function in pTITAN2 is the occurrences function. This is an extension for
+deciding the taxonomic detail to be included in a TITAN run based on `minSplt`
+option in `TITAN2::titan()`.
+`minSplt` is minimum number of occurrences that TITAN is looking for
+taxa to have across the provided sites. The `minSplt` default in TITAN is 5 and
+should never drop below 3.  The default for `occurrences` is `minSplt` = `n` =
+`r as.list(args(pTITAN2::occurrences))$n`.
+
+```{r label = "occurrences_example"}
+head(
+     occurrences(CN_06_Mall_wID[, -1])
+)
+```
+
+Compare these results to working with the raw data.  For example purposes we
+present the summary of the raw data twice,
+once using tidyverse syntax and once using data.table syntax.
+```{r}
+# Tidyverse
+CN_06_Mall_wID %>%
+  dplyr::select(-StationID) %>%
+  tidyr::pivot_longer(
+                      cols = dplyr::everything(),
+                      names_to = 'taxon',
+                      values_to = 'count'
+                      ) %>%
+  dplyr::mutate(
+                Class  = substr(.data$taxon, 1L, 2L),
+                Order  = substr(.data$taxon, 3L, 4L),
+                Family = substr(.data$taxon, 5L, 6L),
+                Genus  = substr(.data$taxon, 7L, 8L)
+                ) %>%
+  dplyr::group_by(.data$Class, .data$Order, .data$Family, .data$Genus) %>%
+  dplyr::summarise(
+                   taxon = unique(.data$taxon),
+                   count = sum(.data$count > 0),
+                   .groups = "keep"
+                   ) %>%
+  dplyr::ungroup() %>%
+  dplyr::filter(.data$count >= 5) %>%
+  dplyr::arrange(.data$Class, .data$Order, .data$Family, .data$Genus)
+```
+
+Using data.table:
+```{r}
+# data.table
+taxon_count <- data.table::copy(CN_06_Mall_wID)
+data.table::setDT(taxon_count)
+data.table::set(taxon_count, j = "StationID", value = NULL)
+for(j in as.integer(which(sapply(taxon_count, is.integer)))) {
+  data.table::set(taxon_count, j = j, value = as.numeric(taxon_count[[j]]))
+}
+
+taxon_count <- data.table::melt(taxon_count,
+                                variable.factor = FALSE,
+                                measure.vars = names(taxon_count),
+                                variable.name = "taxon",
+                                value.name = "count")
+taxon_count[, count := sum(count > 0), keyby = .(taxon)]
+taxon_count <- unique(taxon_count)
+
+data.table::set(taxon_count, j = "Class",  value = substr(taxon_count[["taxon"]], 1L, 2L))
+data.table::set(taxon_count, j = "Order",  value = substr(taxon_count[["taxon"]], 3L, 4L))
+data.table::set(taxon_count, j = "Family", value = substr(taxon_count[["taxon"]], 5L, 6L))
+data.table::set(taxon_count, j = "Genus",  value = substr(taxon_count[["taxon"]], 7L, 8L))
+
+taxon_count <- subset(taxon_count, taxon_count$count >= 5)
+
+data.table::setkeyv(taxon_count, c("taxon", "Class", "Order", "Family", "Genus"))
+
+taxon_count
+```
+
+Note that for the Ar class there is only one row with no order, family, or genus
+level information.  Compare to the Bi class where the Un order has no presence
+counts and is thus not reported in object returned from `occurrences`.  BiVeCa01
+has counts and will be reported but BiVeCa00 should not be reported.  BiVe0000
+and Bi000000 should not be reported as `occurrences` as preference for the codes
+with family and genus level information.
+
+## Function permute
+
+The function permute is used to generate a list of permuted sets of taxa and
+environmental gradients. Function parameters include a list of data frames
+containing taxa for each treatment group, a list of data frames containing the
+associated environmental gradient variables, and the site ids. Before we can run
+permute, we need to import the environmental gradients data.
+
+```{r }
+eg <-
+  permute(taxa = list(CD_06_Mall_wID, CN_06_Mall_wID),
+          envs = list(C_IC_D_06_wID, C_IC_N_06_wID),
+          sid  = "StationID")
+str(eg, max.level = 2)
+```
+
+The return of `permute` is list of lists. The first level denotes the treatment,
+in this example Treatment1 is "dry" and Treatment2 is "normal" -- the order of
+the input data sets.  The second level contains the data.frames with
+environmental and taxonomic data.
+
+
+## Running `TITAN2::titan`
+
+The most computationally expensive part of this work is calling
+`TITAN2::titan` many, many times. A good option is to use the parallel
+package to send the task of permuting the data and running `TITAN2::titan()`
+to individual processing cores.  That is system dependent and left to the end
+user to implement.  For an example of generating the permutations with `TITAN2::titan()`
+see the example script provided at:
+```{r, eval = FALSE}
+system.file("example-scripts", "permutation_example.R", package = "pTITAN2")
+```
+That file will generate the provided data set `permutation_example` with 10 rows
+from 10 permutations of the example data set.
+
+```{r}
+permutation_example
+```
+
+The results are the increasing and decreasing taxa sumz values. In this example only four permutations are
+used and TITAN bootstrapping is limited to five iterations. In an actual analysis these values should
+be much higher. This process is very computationally intensive and can take hours or days to run
+depending on the available computing power and the number of bootstraps and permutations used.
+
+If you have three or more treatments and need to permute over them with the
+condition that no station will be in the same treatment more than once on any
+particular permutation and that all treatment labels are viable for each
+station then you can still use the `permute` function.
+
+
+# References
+<div id="refs"></div>
+
