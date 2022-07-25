@@ -46,6 +46,9 @@ with the station ID and one with the data defining the gradient.
 The taxa data.frames are expected to have the station ID column as well.
 \strong{Important} The station ID column name needs to be the same for all the
 taxa and environmental gradient data.frames.
+
+permute2 will attempt to generate permutations with a minimum frequency of
+taxon.
 }
 \examples{
 

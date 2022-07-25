@@ -501,7 +501,7 @@ library(magrittr)
 
 CD_obs <-
   TITAN2::titan(
-                  env     = C_IC_D_06_wID[["ImpCover"]] # chaparral envgrad dry
+                  env     = C_IC_D_06_wID[["ImpCover"]]
                 , txa     = subset(CD_06_Mall_wID, select = occurrences(CD_06_Mall_wID[, -1], n = 6L)$taxon)
                 , ncpus   = 2
                 , numPerm = 50
@@ -510,7 +510,7 @@ CD_obs <-
 
 CN_obs <-
   TITAN2::titan(
-                  env     = C_IC_N_06_wID[["ImpCover"]] # chaparral envgrad dry
+                  env     = C_IC_N_06_wID[["ImpCover"]]
                 , txa     = subset(CN_06_Mall_wID, select = occurrences(CN_06_Mall_wID[, -1], n = 6L)$taxon)
                 , ncpus   = 2
                 , numPerm = 50

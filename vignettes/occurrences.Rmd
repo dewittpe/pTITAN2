@@ -1,6 +1,6 @@
 ---
 title: "pTITAN2"
-subtitle: "occurrences"
+subtitle: "occurrences and permute"
 output:
   bookdown::html_document2: default
 bibliography: references.bib
@@ -95,7 +95,7 @@ CN_06_Mall_wID[1:4, 1:10]
 occurrences
 ```
 
-A new function in pTITAN2 is the occurrences function. This is an extension for
+The function `occurrences` is an extension for
 deciding the taxonomic detail to be included in a TITAN run based on `minSplt`
 option in `TITAN2::titan()`.
 `minSplt` is minimum number of occurrences that TITAN is looking for
@@ -104,9 +104,7 @@ should never drop below 3.  The default for `occurrences` is `minSplt` = `n` =
 `r as.list(args(pTITAN2::occurrences))$n`.
 
 ```{r label = "occurrences_example"}
-head(
-     occurrences(CN_06_Mall_wID[, -1])
-)
+head(occurrences(CN_06_Mall_wID[, -1]))
 ```
 
 Compare these results to working with the raw data.  For example purposes we
@@ -175,7 +173,7 @@ has counts and will be reported but BiVeCa00 should not be reported.  BiVe0000
 and Bi000000 should not be reported as `occurrences` as preference for the codes
 with family and genus level information.
 
-## Function permute
+## permute
 
 The function permute is used to generate a list of permuted sets of taxa and
 environmental gradients. Function parameters include a list of data frames
@@ -195,35 +193,6 @@ The return of `permute` is list of lists. The first level denotes the treatment,
 in this example Treatment1 is "dry" and Treatment2 is "normal" -- the order of
 the input data sets.  The second level contains the data.frames with
 environmental and taxonomic data.
-
-
-## Running `TITAN2::titan`
-
-The most computationally expensive part of this work is calling
-`TITAN2::titan` many, many times. A good option is to use the parallel
-package to send the task of permuting the data and running `TITAN2::titan()`
-to individual processing cores.  That is system dependent and left to the end
-user to implement.  For an example of generating the permutations with `TITAN2::titan()`
-see the example script provided at:
-```{r, eval = FALSE}
-system.file("example-scripts", "permutation_example.R", package = "pTITAN2")
-```
-That file will generate the provided data set `permutation_example` with 10 rows
-from 10 permutations of the example data set.
-
-```{r}
-permutation_example
-```
-
-The results are the increasing and decreasing taxa sumz values. In this example only four permutations are
-used and TITAN bootstrapping is limited to five iterations. In an actual analysis these values should
-be much higher. This process is very computationally intensive and can take hours or days to run
-depending on the available computing power and the number of bootstraps and permutations used.
-
-If you have three or more treatments and need to permute over them with the
-condition that no station will be in the same treatment more than once on any
-particular permutation and that all treatment labels are viable for each
-station then you can still use the `permute` function.
 
 
 # References
