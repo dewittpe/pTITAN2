@@ -12,10 +12,11 @@
 #' @param titan_args a list of named arguments to pass to \code{\link[TITAN2]{titan}}.
 #'
 #' @seealso \code{\link{permute}}, \code{\link{occurrences}},
-#' \code{\link[TITAN2]{titian}}
+#' \code{\link[TITAN2]{titan}}
 #'
 #' @examples
 #'
+#' \dontrun{
 #' eg <-
 #'   ptitan(taxa = list(CD_06_Mall_wID, CN_06_Mall_wID, CN_06_Mall_wID, CN_06_Mall_wID),
 #'          envs = list(C_IC_D_06_wID, C_IC_N_06_wID, C_IC_N_06_wID, C_IC_N_06_wID),
@@ -27,12 +28,7 @@
 #' eg
 #'
 #' summary(eg)
-#'
-#' ggplot2::ggplot(data = eg[eg$metric == "sumz+", ]) +
-#'   ggplot2::aes(x = `0.50`, color = treatment, fill = treatment) +
-#'   ggplot2::geom_density(alpha = 0.5) +
-#'   ggplot2::geom_vline(mapping = ggplot2::aes(xintercept = `0.50`), data = eg[eg$metric == "sumz+" & eg$permutation == 0, ])
-#'
+#' }
 #' @export
 ptitan <- function(taxa, envs, sid, n = 6L, permutations = 100, titan_args = list(numPerm = 50, nBoot = 50)) {
 

@@ -33,6 +33,7 @@ A wrapper function to generate permustated results from
 }
 \examples{
 
+\dontrun{
 eg <-
   ptitan(taxa = list(CD_06_Mall_wID, CN_06_Mall_wID, CN_06_Mall_wID, CN_06_Mall_wID),
          envs = list(C_IC_D_06_wID, C_IC_N_06_wID, C_IC_N_06_wID, C_IC_N_06_wID),
@@ -44,9 +45,9 @@ eg <-
 eg
 
 summary(eg)
-
+}
 }
 \seealso{
 \code{\link{permute}}, \code{\link{occurrences}},
-\code{\link[TITAN2]{titian}}
+\code{\link[TITAN2]{titan}}
 }
